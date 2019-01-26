@@ -3,17 +3,17 @@ import java.sql.*;
 
 public class LoginModel {
 
-    private static boolean ADMIN;
-    private static boolean WORKER;
-    private static boolean DISPLAY;
-    private static final String CONNECTION = "jdbc:mysql://localhost:3306/GymPro";
+    private static boolean kierownikPrivilege;
+    private static boolean pracownikPrivilege;
+    private static boolean demoPrivilege;
+    private static final String CONNECTION = "jdbc:mysql://localhost:3306/gamestore?useUnicode=true&useJDBCCompliantTimezoneShift=true&useLegacyDatetimeCode=false&serverTimezone=UTC";
     private static Connection connection;
 
 
     public boolean isLoggedIn(String USERNAME, String PASSWORD){
         try{
-            Class.forName("com.mysql.jdbc.Driver");
-            this.connection = DriverManager.getConnection(CONNECTION, USERNAME, PASSWORD);
+            Class.forName("com.mysql.cj.jdbc.Driver");
+            connection = DriverManager.getConnection(CONNECTION, USERNAME, PASSWORD);
             setUpUserAttributes(USERNAME);
             return true;
         }
@@ -28,50 +28,54 @@ public class LoginModel {
         }
     }
 
-    public void setUpUserAttributes(String USERNAME){
+    private void setUpUserAttributes(String USERNAME){
         PreparedStatement pr;
         ResultSet rs;
         String option = null;
 
         try {
-            pr = this.connection.prepareStatement("SELECT stanowisko FROM pracownicy WHERE login = ? ");
+            pr = connection.prepareStatement("SELECT uprawnienia FROM uzytkownicy WHERE login = ? ");
             pr.setString(1, USERNAME);
             rs = pr.executeQuery();
 
             if (rs.next()) {
-                option = rs.getString(2);
+                option = rs.getString(1);
             }
+            else
+                return;
         }
         catch(SQLException ex) {
-            ADMIN = false;
-            WORKER = false;
-            DISPLAY = false;
+            kierownikPrivilege = false;
+            pracownikPrivilege = false;
+            demoPrivilege = false;
         }
 
-        if(option == null)
-            return;
 
-        else if(option.equals("kierownik"))
-            ADMIN = true;
-
-        else if(option.equals("pracownik"))
-            WORKER = true;
-
-        else if(option.equals("DISPLAY"))
-            DISPLAY = true;
+        if(option.equals("kierownik")) {
+            kierownikPrivilege = true;
+            pracownikPrivilege = true;
+            demoPrivilege = true;
+        }
+        else if(option.equals("pracownik")) {
+            pracownikPrivilege = true;
+            demoPrivilege = true;
+        }
+        else if(option.equals("demo")) {
+            demoPrivilege = true;
+        }
     }
 
     public static Connection getConnection(){
         return connection;
     }
 
-    public static boolean isAdmin(){
-        return ADMIN;
+    public static boolean hasKierownikPrivilege(){
+        return kierownikPrivilege;
     }
-    public static boolean isWorker(){
-        return WORKER;
+    public static boolean hasPracownikPrivilege(){
+        return pracownikPrivilege;
     }
-    public static boolean isDisplay(){
-        return DISPLAY;
+    public static boolean hasDemoPrivilege(){
+        return demoPrivilege;
     }
 }

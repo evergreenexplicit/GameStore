@@ -25,7 +25,7 @@ public class LoginController {
         if(loginModel.isLoggedIn(user, pass)) {
             System.out.println("Użytkownik " + user + " został zalogowany do systemu.");
             Main main = new Main();
-            main.start(new Stage());
+           main.start(new Stage());
             Stage stageToClose = (Stage) username.getScene().getWindow();
             stageToClose.close();
         }

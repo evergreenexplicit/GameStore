@@ -13,7 +13,7 @@ public class LoginApplication extends Application {
         Parent root = (Parent) FXMLLoader.load(getClass().getResource("login.fxml"));
         Scene scene = new Scene(root);
         primaryStage.setScene(scene);
-        primaryStage.setTitle("GymPro - login");
+        primaryStage.setTitle("GameStore - login");
         primaryStage.show();
     }
 
